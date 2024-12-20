@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Application by sahil kumar</title>
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: #333;
+      z-index: 1000;
+      padding: 10px 0;
+    }
+
+    .navbar-container {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-link:hover {
+      background-color: #555;
+    }
+
+    .hamburger {
+      display: none;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 5px 0;
+    }
+
+    @media (max-width: 768px) {
+      .navbar-container {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background-color: #333;
+        width: 200px;
+      }
+      
+      .navbar-container.active {
+        display: flex;
+      }
+
+      .hamburger {
+        display: block;
+      }
+    }
+
+    .search-container {
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #city-name {
+      padding: 10px;
+      width: 50%;
+      margin-right: 10px;
+    }
+
+    #search-btn {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #333;
+      color: white;
+      border: none;
+      transition: background-color 0.3s;
+    }
+
+    #search-btn:hover {
+      background-color: #555;
+    }
+
+    #error-message {
+      color: red;
+      display: none;
+    }
+
+    #weather-details {
+      text-align: center;
+      padding: 30px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      margin-top: 50px;
+    }
+
+    #weather-details h2 {
+      font-size: 2em;
+    }
+
+    #weather-details p {
+      font-size: 1.2em;
+    }
+    #about {
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    #about img {
+      width: 150px;
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: none;
+      padding: 0 10px;
+    }
+
+    footer button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    footer button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  
+  <nav>
+    <div class="navbar-container">
+      <a href="#weather-details" class="nav-link">Weather</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#footer" class="nav-link">Footer</a>
+    </div>
+    <div class="hamburger" id="hamburger-menu">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+
+  <div class="search-container">
+    <input type="text" id="city-name" placeholder="Enter a city name">
+    <button id="search-btn">Search</button>
+    <p id="error-message"></p>
+  </div>
+
+  
+  <div id="weather-details">
+    <h2 id="city-name-display">City Name</h2>
+    <p id="date"></p>
+    <p id="temperature">Temperature: </p>
+    <p id="description">Description: </p>
+    <p id="humidity">Humidity: </p>
+    <p id="wind-speed">Wind Speed: </p>
+    <p id="pressure">Pressure: </p>
+  </div>
+
+  
+  <section id="about">
+    <h2>About This Application</h2>
+    <p>This application provides realtime weather updates for any city across the globe .just search thr namr and get results.</p>
+    <img src="data:image/png;base64,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" alt="Weather Icon" />
+  </section>
+
+  
+  <footer id="footer">
+    <div>
+      <a href="https://github.com/sahilkgp14" target="_blank">GitHub</a> |
+      <a href="https://www.linkedin.com/in/sahil-kumar-35963a2a6?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">linkedin</a>
+    </div>
+    
+    <button onclick="scrollToTop()">Back to Top</button>
+  </footer>
+
+  <script>
+    document.getElementById('hamburger-menu').addEventListener('click', () => {
+      document.querySelector('.navbar-container').classList.toggle('active');
+    });
+
+    const links = document.querySelectorAll('.nav-link');
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('.navbar-container').classList.remove('active');
+      });
+    });
+    document.getElementById('search-btn').addEventListener('click', () => {
+      const city = document.getElementById('city-name').value;
+      if (!city) {
+        document.getElementById('error-message').innerText = "Please enter a city name.";
+        document.getElementById('error-message').style.display = "block";
+      } else {
+        document.getElementById('error-message').style.display = "none";
+        getWeatherData(city);
+      }
+    });
+    function getWeatherData(city) {
+  const apiKey = "bd5e378503939ddaee76f12ad7a97608"
+
+  
+  
+  city = city.trim();
+  
+  
+  if (!city) {
+    document.getElementById('error-message').innerText = "Please enter a city name.";
+    document.getElementById('error-message').style.display = "block";
+    return; 
+  }
+  
+  fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.cod !== 200) {
+        document.getElementById('error-message').innerText = "City not found!";
+        document.getElementById('error-message').style.display = "block";
+      } else {
+        
+        document.getElementById('city-name-display').innerText = data.name;
+        document.getElementById('date').innerText = new Date().toLocaleDateString();
+        document.getElementById('temperature').innerText = `Temperature: ${data.main.temp} °C`;
+        document.getElementById('description').innerText = `Description: ${data.weather[0].description}`;
+        document.getElementById('humidity').innerText = `Humidity: ${data.main.humidity}%`;
+        document.getElementById('wind-speed').innerText = `Wind Speed: ${data.wind.speed} m/s`;
+        document.getElementById('pressure').innerText = `Pressure: ${data.main.pressure} hPa`;
+      }
+    })
+    .catch(error => {
+      
+      console.error("Error fetching weather data:", error);
+      document.getElementById('error-message').innerText = "An error occurred while fetching weather data.";
+      document.getElementById('error-message').style.display = "block";
+    });
+}
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
